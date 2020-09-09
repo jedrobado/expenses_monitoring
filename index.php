@@ -292,7 +292,15 @@ if (isset($_POST['download_expenses'])) {
 	</div>
 </div>
 
-
+<div class="row mx-auto">
+	<div class="col-md-12 p-2">
+		<div class="row">
+			<div class="col-md-12 mb-2">
+				<canvas id="lineChart"></canvas>
+			</div>
+		</div>
+	</div>
+</div>
 <!-- content -->
 <div class="modal fade" id="download_expenses_modal" tabindex="-1" role="dialog" aria-hidden="true">
 	<div class="modal-dialog modal-md" role="document">
@@ -347,6 +355,55 @@ $(document).ready(function(){
 		"scrollX": true,
 		"info": false,
 		"order":[ 4, "desc" ]
+	});
+	
+	//Charts
+	$.ajax({
+		url:"processes/load_charts.php",
+		type:"GET",
+		success:function(data){
+			console.log(data);
+
+			var total_expenses = [];
+			var date_added = [];
+			var color = [];
+			var dynamicColors = function() {
+				var r = Math.floor(Math.random() * 255);
+				var g = Math.floor(Math.random() * 255);
+				var b = Math.floor(Math.random() * 255);
+				var a = Math.floor(Math.random() * 255);
+            	return "rgb(" + r + "," + g + "," + b + ", "+ a +")";
+         	};
+
+			for(var i in data){
+				date_added.push(data[i].date_added);
+				total_expenses.push(data[i].total_expenses);
+				color.push(dynamicColors());
+			}
+
+			var chartData = {
+				labels:date_added,
+				datasets:[
+					{
+						label: 'Daily Total Expenses',
+						backgroundColor: color,
+						borderColor: '#46d5f1',
+						hoverBackgroundColor: "#64dd17",
+						hoverBorderColor: '#666666',
+						data: total_expenses
+					}	
+				]
+			};
+
+			var graphTarget = $("#lineChart");
+			var lineChart = new Chart(graphTarget,{
+				type:"bar",
+				data: chartData
+			});
+		},
+		error:function(data) {
+      		console.log(data);
+    	}
 	});
 });
 </script>
