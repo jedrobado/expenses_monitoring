@@ -1,0 +1,11 @@
+<?php
+header('Content-Type: application/json');
+include("../includes/connect.php");
+$expenses=retrieve("SELECT SUM(item_quantity * item_price) AS total_expenses, date_added FROM items GROUP BY DAY(date_added) ORDER BY date_added ASC");
+$data = array();
+foreach ($expenses as $expenses_row) {
+	$data[] = $expenses_row;
+}
+
+echo json_encode($data);
+?>
